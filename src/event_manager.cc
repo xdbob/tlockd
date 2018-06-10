@@ -60,7 +60,7 @@ void eventManager::run() {
 
 		for (int i = 0; i < nfds; ++i) {
 			auto fct = callbacks[evs[i].data.fd];
-			if (evs[i].events == EPOLLHUP)
+			if (evs[i].events & EPOLLHUP)
 				unregisterEvent(evs[i].data.fd);
 			if (!fct)
 				continue;

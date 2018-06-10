@@ -61,7 +61,7 @@ childsTTY::~childsTTY() {
 }
 
 bool childsTTY::handle_tty(const struct epoll_event &e) {
-	if (focus.expired() || e.events == EPOLLHUP)
+	if (focus.expired() || e.events & EPOLLHUP)
 		return true;
 	focus.lock()->write(buf, io::read(ttyfd, buf, sizeof (buf)));
 	return true;
@@ -81,7 +81,7 @@ void childsTTY::spawnChild(const prog_t &cmd) {
 }
 
 bool childsTTY::handle_child_event(const struct epoll_event &e, std::shared_ptr<child> c) {
-	if (e.events == EPOLLHUP)
+	if (e.events & EPOLLHUP)
 		return true;
 
 	auto r = c->read(buf, sizeof (buf));
