@@ -31,10 +31,10 @@ eventManager::eventManager(size_t residentEvents) : resident(residentEvents) {
 }
 
 void eventManager::registerEvent(int fd, callback_t clbk, bool resident) {
-	struct epoll_event ev = {
-		.events = EPOLLIN | EPOLLHUP | EPOLLERR,
-		.data = { .fd = fd },
-	};
+	struct epoll_event ev;
+	ev.events = EPOLLIN | EPOLLHUP | EPOLLERR;
+	ev.data.fd = fd;
+
 	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &ev) < 0)
 		throw make_system_error("epoll_ctl(ADD)");
 	callbacks[fd] = clbk;
