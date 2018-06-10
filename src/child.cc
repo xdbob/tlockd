@@ -81,3 +81,7 @@ size_t child::getBufCount() const {
 void child::getBuffer(void *buf) const {
 	rb->read(buf, rb->getCount());
 }
+
+child::~child() {
+	close(pty);
+}

@@ -31,7 +31,7 @@ class child {
 public:
 	child(const struct termios *attr, const struct winsize *winsz,
 	      const char *path, const char *const argv[], bool buffered = true);
-	virtual ~child() {}
+	~child();
 
 	size_t read(void *buf, size_t count);
 	size_t write(const void *buf, size_t count);
