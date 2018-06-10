@@ -1,0 +1,27 @@
+project('tlock', ['c', 'cpp'],
+  default_options: [
+    'c_std=c99',
+    'cpp_std=c++17',
+    ]
+  )
+
+cc = meson.get_compiler('cpp')
+libutil = cc.find_library('util', required: true)
+add_global_arguments('-D_POSIX_C_SOURCE', language : 'cpp')
+add_global_arguments('-D_DEFAULT_SOURCE', language : 'cpp')
+
+src = [
+  'event_manager.cc',
+  'io.cc',
+  'main.cc',
+  'ringbuffer.cc',
+  'signal_event_handler.cc',
+  'child.cc',
+  'child_manager.cc',
+  'childs_tty.cc',
+  ]
+
+executable('tlock',
+  src,
+  dependencies: [ libutil ],
+  )
