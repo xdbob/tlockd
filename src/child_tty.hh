@@ -38,12 +38,15 @@ protected:
 	void setFocus(const std::weak_ptr<child>& c);
 	const std::weak_ptr<child>& getFocus() const { return focus; }
 private:
+	bool handle_tty(const struct epoll_event &e);
+	void applyWinsz(std::shared_ptr<child>& c);
+
 	std::weak_ptr<child> focus;
 	int ttyfd;
 	const struct termios attrs;
 	struct winsize winp;
 	eventManager& mgr;
-	bool handle_tty(const struct epoll_event &e);
+	signalEventHandler &ev;
 	unsigned char buf[4096];
 };
 

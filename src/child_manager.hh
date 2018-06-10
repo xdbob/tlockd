@@ -38,6 +38,7 @@ protected:
 					std::shared_ptr<child> c);
 	virtual bool onChildDestroy(const std::shared_ptr<child> &c);
 	void registerChild(std::shared_ptr<child> &&c);
+	void applyAll(std::function<void(std::shared_ptr<child> &c)> f);
 private:
 	bool child_handler(const struct epoll_event &e);
 	std::unordered_map<pid_t, std::shared_ptr<child>> childs_pid;

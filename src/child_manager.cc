@@ -84,3 +84,8 @@ void childManager::spawnChild(const prog_t &cmd) {
 std::shared_ptr<child> childManager::createChild(const prog_t &cmd) {
 	return std::make_shared<child>(nullptr, nullptr, cmd.first, cmd.second);
 }
+
+void childManager::applyAll(std::function<void(std::shared_ptr<child> &c)> f) {
+	for (auto& c : childs_pid)
+		f(c.second);
+}

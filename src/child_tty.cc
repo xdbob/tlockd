@@ -33,7 +33,7 @@ static struct termios getAttrs(int fd) {
 
 childsTTY::childsTTY(int ttyfd, signalEventHandler& ev, eventManager& mgr) :
 		childManager(ev, mgr), ttyfd(ttyfd),
-		attrs(getAttrs(ttyfd)), mgr(mgr) {
+		attrs(getAttrs(ttyfd)), mgr(mgr), ev(ev) {
 	if (ioctl(ttyfd, TIOCGWINSZ, &winp) < 0)
 		throw make_system_error("tiocgwinsz");
 
@@ -44,12 +44,20 @@ childsTTY::childsTTY(int ttyfd, signalEventHandler& ev, eventManager& mgr) :
 		throw make_system_error("tcsetattr");
 
 	mgr.registerEvent(ttyfd, [this](const auto& e){ return handle_tty(e); }, true);
+	ev.registerCallback(SIGWINCH, [this](const auto& e) {
+			(void) e;
+			if (ioctl(this->ttyfd, TIOCGWINSZ, &winp) < 0)
+				throw make_system_error("tiocgwinsz");
+			applyAll([this](auto& c){ applyWinsz(c); });
+			return true;
+		});
 }
 
 childsTTY::~childsTTY() {
 	if (tcsetattr(ttyfd, TCSANOW, &attrs))
 		warn("tcsetattr");
 	mgr.unregisterEvent(ttyfd);
+	ev.unregisterCallback(SIGWINCH);
 }
 
 bool childsTTY::handle_tty(const struct epoll_event &e) {
@@ -94,4 +102,9 @@ void childsTTY::setFocus(const std::weak_ptr<child>& c) {
 	unsigned char buf[sz];
 	tmp->getBuffer(buf);
 	io::write(ttyfd, buf, sz);
+}
+
+void childsTTY::applyWinsz(std::shared_ptr<child>& c) {
+	if (ioctl(c->getPty(), TIOCSWINSZ, &winp) < 0)
+		throw make_system_error("tiocswinsz");
 }
