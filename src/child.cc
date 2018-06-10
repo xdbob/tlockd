@@ -48,8 +48,7 @@ child::child(const struct termios *attr, const struct winsize *winp,
 		auto err = make_system_error("fcntl(SETFD, CLOEXEC)");
 		close(pty);
 		terminate();
-		int tmp;
-		waitpid(pid, &tmp, 0);
+		waitpid(pid, nullptr, 0);
 		throw err;
 	}
 	if (buffered && winp) {
