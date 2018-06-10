@@ -22,7 +22,7 @@
 
 # include <utility>
 
-# include "childs_tty.hh"
+# include "child_tty.hh"
 
 class lockerMgr : public childsTTY {
 public:

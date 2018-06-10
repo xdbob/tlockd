@@ -20,7 +20,7 @@
 #include <err.h>
 
 #include "child.hh"
-#include "childs_tty.hh"
+#include "child_tty.hh"
 #include "error.hh"
 #include "io.hh"
 

@@ -6,7 +6,7 @@ add_global_arguments('-D_DEFAULT_SOURCE', language : 'cpp')
 src = [
   'child.cc',
   'child_manager.cc',
-  'childs_tty.cc',
+  'child_tty.cc',
   'event_manager.cc',
   'io.cc',
   'locker_mgr.cc',

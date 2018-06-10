@@ -22,12 +22,11 @@
 #include <exception>
 #include <signal.h>
 
+#include "child_tty.hh"
 #include "event_manager.hh"
-#include "signal_event_handler.hh"
-#include "childs_tty.hh"
 #include "io.hh"
-
 #include "locker_mgr.hh"
+#include "signal_event_handler.hh"
 
 static bool exitSignal(const struct signalfd_siginfo &info) {
 	(void) info;
