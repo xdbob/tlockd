@@ -1,4 +1,4 @@
-project('tlock', ['c', 'cpp'],
+project('tlockd', ['c', 'cpp'],
   default_options: [
     'c_std=c99',
     'cpp_std=c++17',
@@ -22,7 +22,7 @@ src = [
   'signal_event_handler.cc',
   ]
 
-executable('tlock',
+executable('tlockd',
   src,
   dependencies: [ libutil ],
   )
