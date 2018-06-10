@@ -37,8 +37,12 @@ bool childsTTY::handle_tty(const struct epoll_event &e) {
 	return true;
 }
 
-void childsTTY::spawnChild(const char *path, char *const argv[]) {
-	auto c = std::make_shared<child>(&attrs, &winp, path, argv);
+std::shared_ptr<child> childsTTY::createChild(const prog_t &cmd) {
+	return std::make_shared<child>(&attrs, &winp, cmd.first, cmd.second);
+}
+
+void childsTTY::spawnChild(const prog_t &cmd) {
+	auto c = createChild(cmd);
 
 	if (focus.expired())
 		focus = c;

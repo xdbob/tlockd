@@ -9,7 +9,7 @@
 class child {
 public:
 	child(const struct termios *attr, const struct winsize *winsz,
-	      const char *path, char *const argv[]);
+	      const char *path, const char *const argv[]);
 	virtual ~child() {}
 
 	virtual size_t read(void *buf, size_t count);

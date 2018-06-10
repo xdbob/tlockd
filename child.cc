@@ -11,13 +11,13 @@
 #include "io.hh"
 
 child::child(const struct termios *attr, const struct winsize *winp,
-	     const char *path, char *const argv[]) {
+	     const char *path, const char *const argv[]) {
 	pid = forkpty(&pty, NULL, attr, winp);
 	if (pid < 0)
 		throw make_system_error("forkpty");
 
 	if (!pid) {
-		execvp(path, argv);
+		execvp(path, (char **)argv);
 		_exit(1);
 	}
 

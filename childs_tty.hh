@@ -11,8 +11,9 @@ public:
 	childsTTY(int ttyfd, signalEventHandler& ev, eventManager& mgr);
 	virtual ~childsTTY();
 
-	virtual void spawnChild(const char *path, char *const argv[]) override;
+	virtual void spawnChild(const prog_t &cmd) override;
 protected:
+	virtual std::shared_ptr<child> createChild(const prog_t &cmd) final;
 	virtual bool handle_child_event(const struct epoll_event &e,
 					std::shared_ptr<child> c) override;
 private:

@@ -4,16 +4,17 @@
 # include <unordered_map>
 # include <memory>
 
+# include "child.hh"
 # include "signal_event_handler.hh"
-
-class child;
 
 class childManager {
 public:
+	using prog_t = std::pair<const char *, const char * const *>;
 	childManager(signalEventHandler& ev, eventManager& mgr);
 	virtual ~childManager();
-	virtual void spawnChild(const char *path, char *const argv[]);
+	virtual void spawnChild(const prog_t &cmd);
 protected:
+	virtual std::shared_ptr<child> createChild(const prog_t &cmd);
 	virtual bool handle_child_event(const struct epoll_event &e,
 					std::shared_ptr<child> c);
 	void registerChild(std::shared_ptr<child> &&c);

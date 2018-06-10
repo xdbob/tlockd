@@ -53,6 +53,10 @@ void childManager::registerChild(std::shared_ptr<child> &&c) {
 		});
 }
 
-void childManager::spawnChild(const char *path, char *const argv[]) {
-	registerChild(std::make_shared<child>(nullptr, nullptr, path, argv));
+void childManager::spawnChild(const prog_t &cmd) {
+	registerChild(createChild(cmd));
+}
+
+std::shared_ptr<child> childManager::createChild(const prog_t &cmd) {
+	return std::make_shared<child>(nullptr, nullptr, cmd.first, cmd.second);
 }

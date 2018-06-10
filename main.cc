@@ -12,7 +12,7 @@ static bool exitSignal(const struct signalfd_siginfo &info) {
 	return false;
 }
 
-int main(int argc, char *const argv[]) {
+int main(int argc, const char *const argv[]) {
 	(void) argc;
 
 	eventManager mgr;
@@ -20,7 +20,7 @@ int main(int argc, char *const argv[]) {
 	sigs.registerCallback(SIGINT, exitSignal);
 
 	childsTTY ct(0, sigs, mgr);
-	ct.spawnChild(argv[1], argv + 1);
+	ct.spawnChild({ argv[1], argv + 1 });
 
 	try {
 		mgr.run();
