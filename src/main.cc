@@ -1,6 +1,7 @@
 #include <cstdio>
-#include <signal.h>
+#include <cstdlib>
 #include <exception>
+#include <signal.h>
 
 #include "event_manager.hh"
 #include "signal_event_handler.hh"
@@ -42,7 +43,8 @@ int main(int argc, const char *const argv[]) {
 		mgr.run();
 	} catch (std::exception &e) {
 		fprintf(stderr, "error: %s", e.what());
+		return EXIT_FAILURE;
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
