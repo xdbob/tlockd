@@ -17,7 +17,10 @@ int main(int argc, const char *const argv[]) {
 
 	eventManager mgr;
 	signalEventHandler sigs(mgr);
-	sigs.registerCallback(SIGINT, exitSignal);
+
+	for (const auto s : { SIGINT, SIGTERM, SIGSTOP})
+		sigs.registerCallback(s, exitSignal);
+
 
 	childsTTY ct(0, sigs, mgr);
 	ct.spawnChild({ argv[1], argv + 1 });
