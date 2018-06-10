@@ -1,3 +1,4 @@
+#include <cassert>
 #include <fcntl.h>
 #include <pty.h>
 #include <signal.h>
@@ -13,7 +14,7 @@
 #include "signal_event_handler.hh"
 
 child::child(const struct termios *attr, const struct winsize *winp,
-	     const char *path, const char *const argv[]) {
+	     const char *path, const char *const argv[], bool buffered) {
 	pid = forkpty(&pty, NULL, attr, winp);
 	if (pid < 0)
 		throw make_system_error("forkpty");
@@ -32,6 +33,10 @@ child::child(const struct termios *attr, const struct winsize *winp,
 		waitpid(pid, &tmp, 0);
 		throw err;
 	}
+	if (buffered && winp) {
+		assert(winp->ws_col && winp->ws_row);
+		rb = std::make_unique<ringbuffer>(winp->ws_col * winp->ws_row);
+	}
 }
 
 void child::terminate() {
@@ -39,9 +44,22 @@ void child::terminate() {
 }
 
 size_t child::read(void *buf, size_t count) {
-	return io::read(pty, buf, count);
+	auto r = io::read(pty, buf, count);
+	if (rb)
+		rb->push(buf, r);
+	return r;
 }
 
 size_t child::write(const void *buf, size_t count) {
 	return io::write(pty, buf, count);
+}
+
+size_t child::getBufCount() const {
+	if (!rb)
+		return 0;
+	return rb->getCount();
+}
+
+void child::getBuffer(void *buf) const {
+	rb->read(buf, rb->getCount());
 }

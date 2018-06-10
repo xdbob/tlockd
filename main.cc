@@ -7,6 +7,8 @@
 #include "childs_tty.hh"
 #include "io.hh"
 
+#include "locker_mgr.hh"
+
 static bool exitSignal(const struct signalfd_siginfo &info) {
 	(void) info;
 	return false;
@@ -21,9 +23,20 @@ int main(int argc, const char *const argv[]) {
 	for (const auto s : { SIGINT, SIGTERM, SIGSTOP})
 		sigs.registerCallback(s, exitSignal);
 
-
-	childsTTY ct(0, sigs, mgr);
-	ct.spawnChild({ argv[1], argv + 1 });
+	const char * const tst[] = { "vlock", "-c", nullptr };
+	const char *vl = "vlock";
+	lockerMgr::prog_t lckcmd(vl, tst);
+	lockerMgr ct(0, sigs, mgr, {argv[1], argv + 1}, lckcmd);
+	sigs.registerCallback(SIGUSR1, [&ct](const auto &x) {
+			(void) x;
+			ct.lock();
+			return true;
+		});
+	sigs.registerCallback(SIGUSR2, [&ct](const auto &x) {
+			(void) x;
+			ct.unlock();
+			return true;
+		});
 
 	try {
 		mgr.run();

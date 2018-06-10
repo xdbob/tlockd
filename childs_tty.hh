@@ -16,6 +16,8 @@ protected:
 	virtual std::shared_ptr<child> createChild(const prog_t &cmd) final;
 	virtual bool handle_child_event(const struct epoll_event &e,
 					std::shared_ptr<child> c) override;
+	void setFocus(const std::weak_ptr<child>& c);
+	const std::weak_ptr<child>& getFocus() const { return focus; }
 private:
 	std::weak_ptr<child> focus;
 	int ttyfd;

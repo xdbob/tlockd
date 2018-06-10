@@ -15,6 +15,9 @@ static struct termios getAttrs(int fd) {
 childsTTY::childsTTY(int ttyfd, signalEventHandler& ev, eventManager& mgr) :
 		childManager(ev, mgr), ttyfd(ttyfd),
 		attrs(getAttrs(ttyfd)), mgr(mgr) {
+	if (ioctl(ttyfd, TIOCGWINSZ, &winp) < 0)
+		throw make_system_error("tiocgwinsz");
+
 	struct termios tmp = attrs;
 	cfmakeraw(&tmp);
 
@@ -59,4 +62,17 @@ bool childsTTY::handle_child_event(const struct epoll_event &e, std::shared_ptr<
 		io::write(ttyfd, buf, r);
 
 	return true;
+}
+
+void childsTTY::setFocus(const std::weak_ptr<child>& c) {
+	auto tmp = c.lock();
+	if (tmp == focus.lock())
+		return;
+	focus = c;
+	io::write(ttyfd, "\033c", 2); // clear screen
+	auto sz = tmp->getBufCount();
+	// XXX: TODO no vla
+	unsigned char buf[sz];
+	tmp->getBuffer(buf);
+	io::write(ttyfd, buf, sz);
 }

@@ -19,7 +19,7 @@ void ringbuffer::push(const void *buf, size_t count) {
 		count = size;
 	}
 
-	size_t pos = head + this->count;
+	size_t pos = (head + this->count) % size;
 	size_t to_cpy = pos + count > size ? size - pos : count;
 	memcpy(dst + pos, src, to_cpy);
 	if (to_cpy < count)
@@ -37,7 +37,7 @@ size_t ringbuffer::read(void *dst, size_t count) const {
 	if (count > this->count)
 		count = this->count;
 
-	size_t to_cpy = head + count > this->count ? size - head : count;
+	size_t to_cpy = head + count > this->size ? size - head : count;
 	memcpy(d, src + head, to_cpy);
 	if (to_cpy < count)
 		memcpy(d + to_cpy, src, count - to_cpy);
