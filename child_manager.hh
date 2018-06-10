@@ -17,6 +17,7 @@ protected:
 	virtual std::shared_ptr<child> createChild(const prog_t &cmd);
 	virtual bool handle_child_event(const struct epoll_event &e,
 					std::shared_ptr<child> c);
+	virtual bool onChildDestroy(const std::shared_ptr<child> &c);
 	void registerChild(std::shared_ptr<child> &&c);
 private:
 	bool child_handler(const struct epoll_event &e);
