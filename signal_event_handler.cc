@@ -7,11 +7,10 @@
 
 int signalEventHandler::sigfd;
 size_t signalEventHandler::refcount;
-sigset_t signalEventHandler::oldset;
+static sigset_t oldset;
 
-static void clean_sigfd(int fd, const sigset_t *mask) {
-	close(fd);
-	sigprocmask(SIG_BLOCK, mask, nullptr);
+void reset_signals() {
+	sigprocmask(SIG_SETMASK, &oldset, nullptr);
 }
 
 signalEventHandler::signalEventHandler(eventManager &e) : e(e){
@@ -20,13 +19,13 @@ signalEventHandler::signalEventHandler(eventManager &e) : e(e){
 		if (sigfillset(&mask) < 0)
 			throw make_system_error("sigfillset");
 
-		if (sigprocmask(SIG_BLOCK, &mask, &oldset) < 0)
+		if (sigprocmask(SIG_SETMASK, &mask, &oldset) < 0)
 			throw make_system_error("sigprocmask");
 
 		sigfd = signalfd(-1, &mask, SFD_CLOEXEC);
 		if (sigfd < 0) {
 			auto err = make_system_error("signalfd");
-			clean_sigfd(-1, &oldset);
+			reset_signals();
 			throw err;
 		}
 	}
@@ -51,8 +50,10 @@ signalEventHandler::signalEventHandler(eventManager &e) : e(e){
 }
 
 signalEventHandler::~signalEventHandler() {
-	if (!--refcount)
-		clean_sigfd(sigfd, &oldset);
+	if (!--refcount) {
+		close(sigfd);
+		reset_signals();
+	}
 	e.unregisterEvent(sigfd);
 }
 

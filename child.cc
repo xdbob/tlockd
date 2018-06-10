@@ -10,6 +10,8 @@
 #include "error.hh"
 #include "io.hh"
 
+#include "signal_event_handler.hh"
+
 child::child(const struct termios *attr, const struct winsize *winp,
 	     const char *path, const char *const argv[]) {
 	pid = forkpty(&pty, NULL, attr, winp);
@@ -17,6 +19,7 @@ child::child(const struct termios *attr, const struct winsize *winp,
 		throw make_system_error("forkpty");
 
 	if (!pid) {
+		reset_signals();
 		execvp(path, (char **)argv);
 		_exit(1);
 	}

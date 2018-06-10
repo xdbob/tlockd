@@ -6,6 +6,8 @@
 
 # include "event_manager.hh"
 
+void reset_signals();
+
 class signalEventHandler {
 public:
 	using callback_t = std::function<bool(const struct signalfd_siginfo &info)>;
@@ -17,7 +19,6 @@ public:
 private:
 	static int sigfd;
 	static size_t refcount;
-	static sigset_t oldset;
 	eventManager &e;
 	std::unordered_map<int, callback_t> handlers;
 };
