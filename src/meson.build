@@ -18,4 +18,5 @@ src = [
 executable('tlockd',
   src,
   dependencies: [ libutil ],
+  install: true,
   )
