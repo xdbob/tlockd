@@ -1,0 +1,61 @@
+#!/bin/sh
+
+PID=$TLOCKD_PID
+
+SHORT=p:h
+LONG=pid:,help
+
+PARSED=`getopt --options $SHORT --longoptions $LONG --name "$0" -- "$@"`
+if [ "$?" -ne "0" ]; then
+	exit 2
+fi
+
+usage() {
+	echo "Usage: $0 [-p pid] (lock|unlock)" >&2
+	echo -e "\n  lock\t\tlock session" >&2
+	echo -e "  unlock\tunlock session" >&2
+	echo -e "\n  -p, --pid=pid\ttlockd pid (ie: don't use TLOCKD_PID environment variable)"
+	echo -e "  -h, --help\tdisplay this help"
+}
+
+check_tlock() {
+	if !kill -0 "$PID" &> /dev/null; then
+		echo "tlockd not found... is tlockd running ?" >&2
+		exit 1
+	fi
+}
+
+lock() {
+	check_tlock
+	kill -USR1 $PID
+}
+
+unlock() {
+	check_tlock
+	kill -USR2 $PID
+}
+
+while true; do
+	case "$1" in
+		-p|--pid)
+			PID="$2"
+			shift 2;
+			;;
+		-h|--help)
+			usage
+			exit 0
+			;;
+		lock)
+			lock
+			break
+			;;
+		unlock)
+			unlock
+			break
+			;;
+		*)
+			usage
+			exit 1
+			;;
+	esac
+done

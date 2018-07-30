@@ -6,3 +6,5 @@ project('tlockd', ['c', 'cpp'],
   )
 
 subdir('src')
+
+install_data('tlock', install_dir : 'bin')
