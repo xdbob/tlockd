@@ -34,18 +34,26 @@ static bool exitSignal(const struct signalfd_siginfo &info) {
 }
 
 int main(int argc, const char *const argv[]) {
-	(void) argc;
-
 	eventManager mgr;
 	signalEventHandler sigs(mgr);
 
 	for (const auto s : { SIGINT, SIGTERM, SIGSTOP})
 		sigs.registerCallback(s, exitSignal);
 
-	const char * const tst[] = { "vlock", "-c", nullptr };
-	const char *vl = "vlock";
-	lockerMgr::prog_t lckcmd(vl, tst);
-	lockerMgr ct(0, sigs, mgr, {argv[1], argv + 1}, lckcmd);
+	const char *shell = getenv("SHELL");
+	if (!shell)
+		shell = "/bin/sh";
+	const char * const shellargv[] = { shell, nullptr };
+
+	lockerMgr::prog_t lckcmd;
+	if (argc < 2) {
+		static const char * const deflock[] = { "vlock", "-c", nullptr };
+		lckcmd = { deflock[0], deflock };
+	} else {
+		lckcmd = { argv[1], argv + 1 };
+	}
+
+	lockerMgr ct(0, sigs, mgr, {shell, shellargv}, lckcmd);
 	sigs.registerCallback(SIGUSR1, [&ct](const auto &x) {
 			(void) x;
 			ct.lock();
