@@ -21,9 +21,11 @@
 #include <cstdlib>
 #include <exception>
 #include <signal.h>
+#include <unistd.h>
 
 #include "child_tty.hh"
 #include "event_manager.hh"
+#include "error.hh"
 #include "io.hh"
 #include "locker_mgr.hh"
 #include "signal_event_handler.hh"
@@ -31,6 +33,14 @@
 static bool exitSignal(const struct signalfd_siginfo &info) {
 	(void) info;
 	return false;
+}
+
+static void registerPid() {
+	char pid[10];
+	snprintf(pid, sizeof (pid), "%u", getpid());
+
+	if (setenv("TLOCKD_PID", pid, 1) < 0)
+		throw make_system_error("setenv");
 }
 
 int main(int argc, const char *const argv[]) {
@@ -52,6 +62,8 @@ int main(int argc, const char *const argv[]) {
 	} else {
 		lckcmd = { argv[1], argv + 1 };
 	}
+
+	registerPid();
 
 	lockerMgr ct(0, sigs, mgr, {shell, shellargv}, lckcmd);
 	sigs.registerCallback(SIGUSR1, [&ct](const auto &x) {
