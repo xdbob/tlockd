@@ -19,7 +19,7 @@ usage() {
 }
 
 check_tlock() {
-	if !kill -0 "$PID" &> /dev/null; then
+	if [ -z "$PID" ] || !kill -0 "$PID" &> /dev/null; then
 		echo "tlockd not found... is tlockd running ?" >&2
 		exit 1
 	fi
