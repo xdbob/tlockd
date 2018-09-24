@@ -28,7 +28,7 @@ class lockerMgr : public childsTTY {
 public:
 	lockerMgr(int ttyfd, signalEventHandler& ev, eventManager& mgr,
 		  const prog_t &base, const prog_t &locker);
-	virtual ~lockerMgr();
+	virtual ~lockerMgr() override;
 	void lock();
 	void unlock();
 protected:

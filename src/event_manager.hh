@@ -39,9 +39,9 @@ public:
 	size_t getResident() const { return resident; }
 	void setResident(size_t r) { resident = r; }
 private:
-	int epollfd;
 	size_t resident;
 	std::unordered_map<int, callback_t> callbacks;
+	int epollfd;
 };
 
 #endif /* !EVENT_MANAGER_HH */

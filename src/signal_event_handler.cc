@@ -58,7 +58,7 @@ signalEventHandler::signalEventHandler(eventManager &e) : e(e){
 					throw make_system_error("read(signafd)");
 				callback_t clbk;
 				try {
-					clbk = handlers.at(fdsi.ssi_signo);
+					clbk = handlers.at(static_cast<pid_t>(fdsi.ssi_signo));
 				} catch (std::out_of_range &) {
 					fprintf(stderr, "Unhandled signal: %d\n",
 							fdsi.ssi_signo);

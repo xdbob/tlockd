@@ -23,8 +23,7 @@
 # include <cstddef>
 
 template <typename T, size_t N>
-constexpr auto array_size(T (&arr)[N]) {
-	(void) arr;
+constexpr auto array_size([[maybe_unused]] T (&arr)[N]) {
 	return N;
 }
 

@@ -28,7 +28,7 @@
 class childsTTY : public childManager {
 public:
 	childsTTY(int ttyfd, signalEventHandler& ev, eventManager& mgr);
-	virtual ~childsTTY();
+	virtual ~childsTTY() override;
 
 	virtual void spawnChild(const prog_t &cmd) override;
 protected:

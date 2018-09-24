@@ -34,7 +34,7 @@
 
 child::child(const struct termios *attr, const struct winsize *winp,
 	     const char *path, const char *const argv[], bool buffered) {
-	pid = forkpty(&pty, NULL, attr, winp);
+	pid = forkpty(&pty, nullptr, attr, winp);
 	if (pid < 0)
 		throw make_system_error("forkpty");
 

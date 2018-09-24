@@ -44,9 +44,11 @@ bool childManager::onChildDestroy(const std::shared_ptr<child> &c) {
 }
 
 bool childManager::handle_signal(const struct signalfd_siginfo &info) {
-	waitpid(info.ssi_pid, nullptr, 0);
+	const auto cpid = static_cast<pid_t>(info.ssi_pid);
 
-	const auto &c = childs_pid.find(info.ssi_pid);
+	waitpid(cpid, nullptr, 0);
+
+	const auto &c = childs_pid.find(cpid);
 	auto lastref = c->second;
 
 	mgr.unregisterEvent(c->second->getPty());
